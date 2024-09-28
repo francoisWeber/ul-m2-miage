@@ -1,0 +1,103 @@
+schema beer {
+    document beer {
+        field id type string {
+        }
+        field brewery_id type string {
+        }
+        field name type string {
+            indexing: index | summary
+        }
+        field cat_id type string {
+        }
+        field style_id type string {
+        }
+        field abv type float {
+            indexing: attribute
+        }
+        field ibu type float {
+            indexing: attribute
+        }
+        field srm type float {
+            indexing: attribute
+        }
+        field upc type int {
+            indexing: attribute
+        }
+        field description_beer type string {
+            indexing: index | summary | attribute
+            index: enable-bm25
+        }
+        field brewery type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+        field address1 type string {
+            indexing: index | summary | attribute
+        }
+        field city type string {
+            indexing: index
+        }
+        field state type string {
+            indexing: index
+        }
+        field code type string {
+        }
+        field country type string {
+            indexing: index | summary
+        }
+        field phone type string {
+        }
+        field website type string {
+        }
+        field description_brewery type string {
+            indexing: index
+            index: enable-bm25
+        }
+        field cat_name type string {
+            indexing: index | summary
+        }
+        field cat_id_styles type string {
+        }
+        field style_name type string {
+            indexing: index | summary
+        }
+        field id_geo type string {
+        }
+        field geoloc type position {
+        }
+        field accuracy type string {
+        }
+        field new_field type string {
+            indexing: index | summary
+        }
+    }
+    fieldset default {
+        fields: name, description_beer
+    }
+
+    rank-profile root {
+        function length_of_descr() {
+            expression: sum(map(attribute(description_beer), f(a)(1)))
+        }
+    }
+
+    rank-profile default inherits root{
+        summary-features: length_of_descr() bm25(brewery) bm25(description_beer)
+        first-phase {
+            expression {
+                bm25(name) + bm25(description_beer)
+            }
+        }
+    }
+
+
+    rank-profile rank-brewery-and-descr inherits root{
+        summary-features: length_of_descr() bm25(description_beer)
+        first-phase {
+            expression {
+                bm25(description_brewery) * bm25(description_beer)
+            }
+        }
+    }
+
+}

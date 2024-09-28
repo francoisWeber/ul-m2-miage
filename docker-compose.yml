@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+
+  # spark-master:
+  #   image: bitnami/spark:3.5.1
+  #   container_name: spark-master
+  #   environment:
+  #     - SPARK_MODE=master
+  #     - SPARK_RPC_AUTHENTICATION_ENABLED=no
+  #     - SPARK_RPC_ENCRYPTION_ENABLED=no
+  #     - SPARK_LOCAL_DIR=/tmp/spark
+  #   ports:
+  #     - "10:10"  # Spark Master Web UI
+  #     - "7077:7077"  # Spark Master
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '1'
+  #         memory: 1G
+  #       reservations:
+  #         cpus: '0.5'
+  #         memory: 500M
+  #   volumes:
+  #     - ./datasets:/datasets:ro
+  #     - shared-data:/data
+
+  # spark-worker:
+  #   image: bitnami/spark:3.5.1
+  #   container_name: spark-worker
+  #   environment:
+  #     - SPARK_MODE=worker
+  #     - SPARK_MASTER_URL=spark://spark-master:7077
+  #     - SPARK_WORKER_MEMORY=4G
+  #     - SPARK_WORKER_CORES=2
+  #     - SPARK_RPC_AUTHENTICATION_ENABLED=no
+  #     - SPARK_RPC_ENCRYPTION_ENABLED=no
+  #     - SPARK_LOCAL_DIR=/tmp/spark
+  #   ports:
+  #     - "8081:8081"  # Spark Worker Web UI
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '2.5'
+  #         memory: '4.5G'
+  #       reservations:
+  #         cpus: '2'
+  #         memory: '4G'
+  #   volumes:
+  #     - ./datasets:/datasets:ro
+  #     - shared-data:/data
+  
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: workshop_db
+      MYSQL_USER: workshop_user
+      MYSQL_PASSWORD: workshop_password
+    volumes:
+      - ./datasets:/datasets:ro
+      - shared-data:/data
+      - ./datasets/beers:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 500M
+
+  # PhpMyAdmin service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+  
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+  #   container_name: elasticsearch
+  #   environment:
+  #     - discovery.type=single-node
+  #     - xpack.security.enabled=false
+  #   volumes:
+  #     - ./datasets:/datasets:ro
+  #     - shared-data:/data
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '2'
+  #         memory: 4G
+  #       reservations:
+  #         cpus: '0.5'
+  #         memory: 500M
+
+  vespa:
+    image: vespaengine/vespa
+    container_name: vespa
+    hostname: vespa-container
+    volumes:
+      - ./datasets:/datasets:ro
+      - shared-data:/data
+      - ./vespa-config:/vespa-config
+    ports:
+      - "8082:10"  # Map Vespa HTTP to port 8082
+      - "19071:19071"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 500M
+
+  jupyterhub:
+    image: custom-jupyterhub:latest
+    container_name: jupyterhub
+    environment:
+      SPARK_MASTER: spark://spark-master:7077
+      JUPYTERHUB_DOCKER_SPAWN_CMD: start-singleuser.sh
+      JUPYTERHUB_API_TOKEN: your_api_token
+    volumes:
+      - ./jupyterhub_config:/srv/jupyterhub
+      - ./jupyter-home:/home/francois.weber
+      - ./datasets:/datasets:ro
+      - shared-data:/data
+      - ./vespa-config:/vespa-config
+    ports:
+      - "8000:8000"
+    depends_on:
+      # - spark-master
+      # - spark-worker
+      - mysql
+      # - elasticsearch
+      - vespa
+
+volumes:
+  shared-data:
+  mysql_data:

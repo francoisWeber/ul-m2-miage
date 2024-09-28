@@ -1,0 +1,1 @@
+- meilleure init de la DB avec un user en RO pour les étudiants : https://chat.mistral.ai/chat/44eef789-bdca-4a61-b340-4b3307805ad0
