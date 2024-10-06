@@ -7,7 +7,7 @@ c.Authenticator.allow_all = True
 # Allow PAM to handle system users
 c.PAMAuthenticator.open_sessions = False
 c.PAMAuthenticator.create_system_users = True
-c.Authenticator.admin_users = {'iaas', "francois.weber"}
+c.Authenticator.admin_users = {'iaas', 'francois'}
 
 # Set the port for JupyterHub
 c.JupyterHub.bind_url = 'http://:8000'

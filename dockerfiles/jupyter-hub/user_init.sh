@@ -1,6 +1,6 @@
 #!/bin/bash
-PASSWORD="iaas"
-USERNAME="iaas"
+USERNAME=iaas
+PASSWORD=azerty
 useradd -u 1000 -g 1000 -m --shell /bin/bash "$USERNAME"
 echo "$USERNAME:$PASSWORD" | chpasswd
 

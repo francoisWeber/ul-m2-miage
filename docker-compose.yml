@@ -50,42 +50,41 @@ services:
   #     - ./datasets:/datasets:ro
   #     - shared-data:/data
   
-  # mysql:
-  #   image: mysql:latest
-  #   container_name: mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: rootpassword
-  #     MYSQL_DATABASE: workshop_db
-  #     MYSQL_USER: workshop_user
-  #     MYSQL_PASSWORD: workshop_password
-  #   volumes:
-  #     - ./datasets:/datasets:ro
-  #     - shared-data:/data
-  #     - ./datasets/beers:/docker-entrypoint-initdb.d
-  #     - mysql_data:/var/lib/mysql
-  #   ports:
-  #     - "3306:3306"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '1'
-  #         memory: 2G
-  #       reservations:
-  #         cpus: '0.5'
-  #         memory: 500M
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: workshop_db
+      MYSQL_USER: workshop_user
+      MYSQL_PASSWORD: workshop_password
+    volumes:
+      - ./datasets:/datasets:ro
+      - shared-data:/data
+      - ./datasets/beers:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 500M
 
-  # PhpMyAdmin service
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin
-  #   container_name: phpmyadmin
-  #   environment:
-  #     PMA_HOST: mysql
-  #     PMA_USER: root
-  #     PMA_PASSWORD: rootpassword
-  #   ports:
-  #     - "8081:80"
-  #   depends_on:
-  #     - mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
   
   # elasticsearch:
   #   image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
@@ -108,25 +107,25 @@ services:
   #         cpus: '0.5'
   #         memory: 500M
 
-  # vespa:
-  #   image: vespaengine/vespa
-  #   container_name: vespa
-  #   hostname: vespa-container
-  #   volumes:
-  #     - ./datasets:/datasets:ro
-  #     - shared-data:/data
-  #     - ./vespa-config:/vespa-config
-  #   ports:
-  #     - "8082:10"  # Map Vespa HTTP to port 8082
-  #     - "19071:19071"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '2'
-  #         memory: 4G
-  #       reservations:
-  #         cpus: '0.5'
-  #         memory: 500M
+  vespa:
+    image: vespaengine/vespa
+    container_name: vespa
+    hostname: vespa-container
+    volumes:
+      - ./datasets:/datasets:ro
+      - shared-data:/data
+      - ./vespa-config:/vespa-config
+    ports:
+      - "8082:10"  # Map Vespa HTTP to port 8082
+      - "19071:19071"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 16G
+        reservations:
+          cpus: '0.5'
+          memory: 8G
 
   jupyterhub:
     build:
@@ -138,20 +137,19 @@ services:
       JUPYTERHUB_API_TOKEN: your_api_token
     volumes:
       # - ./jupyterhub_config:/srv/jupyterhub
-      # - home:/home
-      - ./home:/home/francois.weber:rw
+      - home:/home
+      - ./home:/home/francois:rw
       - ./datasets:/datasets:ro
       - shared-data:/data
       - ./vespa-config:/vespa-config
-    # user: "1000:1000"
     ports:
       - "8000:8000"
-    # depends_on:
+    depends_on:
       # - spark-master
       # - spark-worker
-      # - mysql
+      - mysql
       # - elasticsearch
-      # - vespa
+      - vespa
 
 volumes:
   shared-data:
