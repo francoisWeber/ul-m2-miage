@@ -2,53 +2,53 @@ version: '3.8'
 
 services:
 
-  # spark-master:
-  #   image: bitnami/spark:3.5.1
-  #   container_name: spark-master
-  #   environment:
-  #     - SPARK_MODE=master
-  #     - SPARK_RPC_AUTHENTICATION_ENABLED=no
-  #     - SPARK_RPC_ENCRYPTION_ENABLED=no
-  #     - SPARK_LOCAL_DIR=/tmp/spark
-  #   ports:
-  #     - "10:10"  # Spark Master Web UI
-  #     - "7077:7077"  # Spark Master
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '1'
-  #         memory: 1G
-  #       reservations:
-  #         cpus: '0.5'
-  #         memory: 500M
-  #   volumes:
-  #     - ./datasets:/datasets:ro
-  #     - shared-data:/data
+  spark-master:
+    image: bitnami/spark:3.5.1
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_DIR=/tmp/spark
+    ports:
+      - "10:10"  # Spark Master Web UI
+      - "7077:7077"  # Spark Master
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 500M
+    volumes:
+      - ./datasets:/datasets:ro
+      - shared-data:/data
 
-  # spark-worker:
-  #   image: bitnami/spark:3.5.1
-  #   container_name: spark-worker
-  #   environment:
-  #     - SPARK_MODE=worker
-  #     - SPARK_MASTER_URL=spark://spark-master:7077
-  #     - SPARK_WORKER_MEMORY=4G
-  #     - SPARK_WORKER_CORES=2
-  #     - SPARK_RPC_AUTHENTICATION_ENABLED=no
-  #     - SPARK_RPC_ENCRYPTION_ENABLED=no
-  #     - SPARK_LOCAL_DIR=/tmp/spark
-  #   ports:
-  #     - "8081:8081"  # Spark Worker Web UI
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '2.5'
-  #         memory: '4.5G'
-  #       reservations:
-  #         cpus: '2'
-  #         memory: '4G'
-  #   volumes:
-  #     - ./datasets:/datasets:ro
-  #     - shared-data:/data
+  spark-worker:
+    image: bitnami/spark:3.5.1
+    container_name: spark-worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=2
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_DIR=/tmp/spark
+    ports:
+      - "8081:8081"  # Spark Worker Web UI
+    deploy:
+      resources:
+        limits:
+          cpus: '2.5'
+          memory: '4.5G'
+        reservations:
+          cpus: '2'
+          memory: '4G'
+    volumes:
+      - ./datasets:/datasets:ro
+      - shared-data:/data
   
   mysql:
     image: mysql:latest
@@ -82,7 +82,7 @@ services:
       PMA_USER: root
       PMA_PASSWORD: rootpassword
     ports:
-      - "8081:80"
+      - "8083:80"
     depends_on:
       - mysql
   
@@ -145,8 +145,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      # - spark-master
-      # - spark-worker
+      - spark-master
+      - spark-worker
       - mysql
       # - elasticsearch
       - vespa
