@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y openjdk-11-jdk python3.11 python3.11-ve
 RUN ln -sf /usr/bin/python3.11 /usr/bin/python3 && \
     ln -sf /usr/bin/python3.11 /usr/bin/python
 
-RUN pip install pyspark==3.5.1 hdfs jupyter jupyter_core
+RUN pip install pyspark==3.5.1 hdfs jupyter jupyter_core pyarrow requests numpy
 # Prepare Jupyterhub stuff
 RUN pip install jupyterhub 
 # Prepare other deps for the workshop
