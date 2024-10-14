@@ -3,7 +3,8 @@ version: '3.8'
 services:
 
   spark-master:
-    image: bitnami/spark:3.5.1
+    build:
+      context: /home/iaas/ul-m2-miage-private/dockerfiles/spark
     container_name: spark-master
     environment:
       - SPARK_MODE=master
@@ -11,7 +12,8 @@ services:
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_DIR=/tmp/spark
     ports:
-      - "10:10"  # Spark Master Web UI
+      - "8010:8080"  # Spark Master Web UI
+      - "4040:4040"  # Spark Master Web UI
       - "7077:7077"  # Spark Master
     deploy:
       resources:
@@ -25,14 +27,15 @@ services:
       - ./datasets:/datasets:ro
       - shared-data:/data
 
-  spark-worker:
-    image: bitnami/spark:3.5.1
-    container_name: spark-worker
+  spark-worker1:
+    build:
+      context: /home/iaas/ul-m2-miage-private/dockerfiles/spark
+    container_name: spark-worker1
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
       - SPARK_WORKER_MEMORY=4G
-      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_CORES=1
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_DIR=/tmp/spark
@@ -44,7 +47,33 @@ services:
           cpus: '2.5'
           memory: '4.5G'
         reservations:
-          cpus: '2'
+          cpus: '1'
+          memory: '4G'
+    volumes:
+      - ./datasets:/datasets:ro
+      - shared-data:/data
+
+  spark-worker2:
+    build:
+      context: /home/iaas/ul-m2-miage-private/dockerfiles/spark
+    container_name: spark-worker2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_DIR=/tmp/spark
+    ports:
+      - "8084:8081"  # Spark Worker Web UI
+    deploy:
+      resources:
+        limits:
+          cpus: '2.5'
+          memory: '4.5G'
+        reservations:
+          cpus: '1'
           memory: '4G'
     volumes:
       - ./datasets:/datasets:ro
@@ -146,7 +175,8 @@ services:
       - "8000:8000"
     depends_on:
       - spark-master
-      - spark-worker
+      - spark-worker1
+      - spark-worker2
       - mysql
       # - elasticsearch
       - vespa
