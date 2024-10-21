@@ -5,7 +5,7 @@ schema beer {
         field brewery_id type string {
         }
         field name type string {
-            indexing: index | summary
+            indexing: index | summary | attribute
         }
         field cat_id type string {
         }
@@ -27,8 +27,12 @@ schema beer {
             indexing: index | summary | attribute
             index: enable-bm25
         }
+        field description_brewery type string {
+            indexing: index | summary | attribute
+            index: enable-bm25
+        }
         field brewery type string {
-            indexing: index | summary
+            indexing: index | summary | attribute
             index: enable-bm25
         }
         field address1 type string {
@@ -43,15 +47,11 @@ schema beer {
         field code type string {
         }
         field country type string {
-            indexing: index | summary
+            indexing: index | summary | attribute
         }
         field phone type string {
         }
         field website type string {
-        }
-        field description_brewery type string {
-            indexing: index
-            index: enable-bm25
         }
         field cat_name type string {
             indexing: index | summary
@@ -72,17 +72,21 @@ schema beer {
         }
     }
     fieldset default {
-        fields: name, description_beer
+        fields: name, description_beer, description_brewery
     }
 
     rank-profile root {
         function length_of_descr() {
             expression: sum(map(attribute(description_beer), f(a)(1)))
         }
+
+        function brewery_description_provided() {
+            expression: if(isNan(attribute(description_brewery)), 1, 0)
+        }
     }
 
     rank-profile default inherits root{
-        summary-features: length_of_descr() bm25(brewery) bm25(description_beer)
+        summary-features: bm25(brewery) bm25(description_beer)
         first-phase {
             expression {
                 bm25(name) + bm25(description_beer)
@@ -92,10 +96,10 @@ schema beer {
 
 
     rank-profile rank-brewery-and-descr inherits root{
-        summary-features: length_of_descr() bm25(description_beer)
+        summary-features: bm25(description_beer) bm25(description_brewery)
         first-phase {
             expression {
-                bm25(description_brewery) * bm25(description_beer)
+                bm25(description_brewery) + bm25(description_beer)
             }
         }
     }
