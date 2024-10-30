@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services version="1.0">
     <container id="beer_container" version="1.0">
-        <search></search>
         <document-api></document-api>
+        <search></search>
         <document-processing></document-processing>
+
+        <component id="mxbai" type="hugging-face-embedder">
+            <transformer-model url="https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1/resolve/main/onnx/model_quantized.onnx"/> 
+            <tokenizer-model url="https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1/resolve/main/tokenizer.json"/>
+            <pooling-strategy>cls</pooling-strategy>
+            <normalize>true</normalize>
+        </component>
+        
+        <model-evaluation/>
+
     </container>
     <content id="beer_content" version="1.0">
         <redundancy>1</redundancy>
@@ -22,4 +32,3 @@
         </tuning>
     </content>
 </services>
-

@@ -1,4 +1,5 @@
 
 <validation-overrides>
-    <allow until='2024-10-01'>indexing-change</allow>
+    <allow until='2024-11-01'>indexing-change</allow>
+    <allow until='2024-11-01'>field-type-change</allow>
 </validation-overrides>

@@ -7,6 +7,18 @@ schema beer {
         field name type string {
             indexing: index | summary | attribute
         }
+        field description_beer type string {
+            indexing: index | summary | attribute
+            index: enable-bm25
+        }
+        field brewery type string {
+            indexing: index | summary | attribute
+            index: enable-bm25
+        }
+        field description_brewery type string {
+            indexing: index | summary | attribute
+            index: enable-bm25
+        }
         field cat_id type string {
         }
         field style_id type string {
@@ -23,20 +35,8 @@ schema beer {
         field upc type int {
             indexing: attribute
         }
-        field description_beer type string {
-            indexing: index | summary | attribute
-            index: enable-bm25
-        }
-        field description_brewery type string {
-            indexing: index | summary | attribute
-            index: enable-bm25
-        }
-        field brewery type string {
-            indexing: index | summary | attribute
-            index: enable-bm25
-        }
         field address1 type string {
-            indexing: index | summary | attribute
+            indexing: index
         }
         field city type string {
             indexing: index
@@ -54,7 +54,7 @@ schema beer {
         field website type string {
         }
         field cat_name type string {
-            indexing: index | summary
+            indexing: index | summary | attribute
         }
         field cat_id_styles type string {
         }
@@ -67,26 +67,41 @@ schema beer {
         }
         field accuracy type string {
         }
-        field new_field type string {
-            indexing: index | summary
+        field descr_to_vec type string {
         }
     }
+
+    field mrl_embedding type tensor<float>(x[384]) {
+        indexing: input description_beer | embed mxbai | attribute | index
+        attribute {
+            distance-metric: prenormalized-angular
+        }
+        index {
+            hnsw {
+            max-links-per-node: 18
+            neighbors-to-explore-at-insert: 100
+            }
+        }
+    }
+
     fieldset default {
-        fields: name, description_beer, description_brewery
+        fields: name, description_beer
     }
-
+    rank-profile default {
+        first-phase {
+            expression {
+                bm25(name) + bm25(description_beer)
+            }
+        }
+    }
     rank-profile root {
-        function length_of_descr() {
-            expression: sum(map(attribute(description_beer), f(a)(1)))
-        }
-
-        function brewery_description_provided() {
-            expression: if(isNan(attribute(description_brewery)), 1, 0)
+        first-phase {
+            expression {
+                bm25(description_beer)
+            }
         }
     }
-
-    rank-profile default inherits root{
-        summary-features: bm25(brewery) bm25(description_beer)
+    rank-profile rank-brewery-and-descr {
         first-phase {
             expression {
                 bm25(name) + bm25(description_beer)
@@ -94,14 +109,12 @@ schema beer {
         }
     }
 
-
-    rank-profile rank-brewery-and-descr inherits root{
-        summary-features: bm25(description_beer) bm25(description_brewery)
+    rank-profile ann inherits default {
+        inputs {
+            query(q) tensor<float>(x[384])
+        }
         first-phase {
-            expression {
-                bm25(description_brewery) + bm25(description_beer)
-            }
+            expression: closeness(field, mrl_embedding)
         }
     }
-
 }
