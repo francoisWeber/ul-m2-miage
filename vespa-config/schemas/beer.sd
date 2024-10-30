@@ -72,7 +72,7 @@ schema beer {
     }
 
     field mrl_embedding type tensor<float>(x[384]) {
-        indexing: input description_beer | embed mxbai | attribute | index
+        indexing: (input description_beer) . (input description_brewery) | embed mxbai | attribute | index
         attribute {
             distance-metric: prenormalized-angular
         }
@@ -85,7 +85,7 @@ schema beer {
     }
 
     fieldset default {
-        fields: name, description_beer
+        fields: name, description_beer, description_brewery
     }
     rank-profile default {
         first-phase {
