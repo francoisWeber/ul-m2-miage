@@ -1,7 +1,4 @@
-version: '3.8'
-
 services:
-
   spark-master:
     build:
       context: /home/iaas/ul-m2-miage-private/dockerfiles/spark
@@ -26,6 +23,22 @@ services:
     volumes:
       - ./datasets:/datasets:ro
       - shared-data:/data
+
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379" # redis com
+      - "8011:8001" # redis insights
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '4G'
+        reservations:
+          cpus: '1'
+          memory: '2G'
+    volumes:
+      - redis-data:/data
 
   spark-worker1:
     build:
@@ -185,3 +198,4 @@ volumes:
   shared-data:
   mysql_data:
   home:
+  redis-data:
