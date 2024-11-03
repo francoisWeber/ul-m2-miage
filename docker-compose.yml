@@ -26,6 +26,7 @@ services:
 
   redis:
     image: redis/redis-stack:latest
+    container_name: redis-cache
     ports:
       - "6379:6379" # redis com
       - "8011:8001" # redis insights
@@ -39,6 +40,23 @@ services:
           memory: '2G'
     volumes:
       - redis-data:/data
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant-vdb
+    ports:
+      - "6333:6333" # redis com
+      - "6334:6334" # redis insights
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '16G'
+        reservations:
+          cpus: '1'
+          memory: '2G'
+    volumes:
+      - qdrant-data:/qdrant/storage:z
 
   spark-worker1:
     build:
@@ -127,27 +145,7 @@ services:
       - "8083:80"
     depends_on:
       - mysql
-  
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
-  #   container_name: elasticsearch
-  #   environment:
-  #     - discovery.type=single-node
-  #     - xpack.security.enabled=false
-  #   volumes:
-  #     - ./datasets:/datasets:ro
-  #     - shared-data:/data
-  #   ports:
-  #     - "9200:9200"
-  #     - "9300:9300"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '2'
-  #         memory: 4G
-  #       reservations:
-  #         cpus: '0.5'
-  #         memory: 500M
+
 
   vespa:
     image: vespaengine/vespa
@@ -191,7 +189,8 @@ services:
       - spark-worker1
       - spark-worker2
       - mysql
-      # - elasticsearch
+      - redis
+      - qdrant
       - vespa
 
 volumes:
@@ -199,3 +198,4 @@ volumes:
   mysql_data:
   home:
   redis-data:
+  qdrant-data: 
