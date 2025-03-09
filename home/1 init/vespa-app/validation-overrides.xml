@@ -1,0 +1,6 @@
+
+<validation-overrides>
+    <allow until='2025-01-21'>indexing-change</allow>
+    <allow until='2025-02-21'>content-cluster-removal</allow>
+</validation-overrides>
+

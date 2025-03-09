@@ -1,0 +1,33 @@
+schema quanticpriests {
+    document quanticpriests {
+        field id type string {
+        }
+        field name type string {
+            indexing: index | summary | attribute
+        }
+        field description type string {
+            indexing: index | summary | attribute
+            index: enable-bm25
+        }
+        field width type float {
+            indexing: attribute
+        }
+    }
+    fieldset default {
+        fields: name, description
+    }
+    rank-profile default-ranker {
+        first-phase {
+            expression {
+                bm25(description)
+            }
+        }
+    }
+    rank-profile other-ranking {
+        first-phase {
+            expression {
+                bm25(name) + bm25(description)
+            }
+        }
+    }
+}

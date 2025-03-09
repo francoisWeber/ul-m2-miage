@@ -1,7 +1,5 @@
 "id","brewery_id","name","cat_id","style_id","abv","ibu","srm","upc","filepath","descript","add_user","last_mod"
-"1","812","Hocus Pocus","11","116","4.5","0","0","0",,"Our take on a classic summer ale.  A toast to weeds, rays, and summer haze.  A light, crisp ale for mowing lawns, hitting lazy fly balls, and communing with nature, Hocus Pocus is offered up as a summer sacrifice to clodless days.
-
-Its malty sweetness finishes tart and crisp and is best apprediated with a wedge of orange.","0","2010-07-22 20:00:20"
+"1","812","Hocus Pocus","11","116","4.5","0","0","0",,"Our take on a classic summer ale.  A toast to weeds, rays, and summer haze.  A light, crisp ale for mowing lawns, hitting lazy fly balls, and communing with nature, Hocus Pocus is offered up as a summer sacrifice to clodless days. Its malty sweetness finishes tart and crisp and is best apprediated with a wedge of orange.","0","2010-07-22 20:00:20"
 "2","264","Grimbergen Blonde","-1","-1","6.7","0","0","0",,,"0","2010-07-22 20:00:20"
 "3","779","Widdershins Barleywine","-1","-1","9.1","0","0","0",,,"0","2010-07-22 20:00:20"
 "4","287","Lucifer","-1","-1","8.5","0","0","0",,,"0","2010-07-22 20:00:20"

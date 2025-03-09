@@ -70,9 +70,24 @@ schema beer {
         field descr_to_vec type string {
         }
     }
+    
+    document-summary textual {
+        summary name {}
+        summary id {}
+        summary brewery {}
+        summary description_beer {}
+        summary description_brewery {}
+    }
+
+    document-summary vectorial {
+        summary id {}
+        summary name {}
+        summary mrl_embedding {}
+        summary description_beer {}
+    }    
 
     field mrl_embedding type tensor<float>(x[384]) {
-        indexing: (input description_beer) . (input description_brewery) | embed mxbai | attribute | index
+        indexing: (input description_beer) . (input description_brewery) | embed mxbai | attribute | index | summary
         attribute {
             distance-metric: prenormalized-angular
         }
@@ -87,10 +102,13 @@ schema beer {
     fieldset default {
         fields: name, description_beer, description_brewery
     }
+
     rank-profile default {
+        summary-features: bm25(description_brewery) bm25(description_beer) 
+
         first-phase {
             expression {
-                bm25(name) + bm25(description_beer)
+                bm25(description_brewery) + bm25(description_beer) 
             }
         }
     }

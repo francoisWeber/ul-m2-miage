@@ -22,7 +22,7 @@ services:
           memory: 500M
     volumes:
       - ./datasets:/datasets:ro
-      - shared-data:/data
+      # - shared-data:/data
 
   spark-worker1:
     build:
@@ -31,8 +31,8 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=18G
-      - SPARK_WORKER_CORES=13
+      - SPARK_WORKER_MEMORY=16G
+      - SPARK_WORKER_CORES=32
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_DIR=/tmp/spark
@@ -41,14 +41,14 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '13'
-          memory: 18G
+          cpus: '16'
+          memory: 16G
         reservations:
-          cpus: '13'
+          cpus: '8'
           memory: 500M
     volumes:
       - ./datasets:/datasets:ro
-      - shared-data:/data
+      # - shared-data:/data
 
   spark-worker2:
     build:
@@ -57,8 +57,8 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_WORKER_MEMORY=18G
-      - SPARK_WORKER_CORES=13
+      - SPARK_WORKER_MEMORY=16G
+      - SPARK_WORKER_CORES=32
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_DIR=/tmp/spark
@@ -67,14 +67,14 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '13'
-          memory: 18G
+          cpus: '12'
+          memory: 16G
         reservations:
-          cpus: '13'
+          cpus: '8'
           memory: 500M
     volumes:
       - ./datasets:/datasets:ro
-      - shared-data:/data
+      # - shared-data:/data
 
   redis:
     image: redis/redis-stack:latest
@@ -120,7 +120,7 @@ services:
       MYSQL_PASSWORD: workshop_password
     volumes:
       - ./datasets:/datasets:ro
-      - shared-data:/data
+      # - shared-data:/data
       - ./datasets/beers:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
     ports:
@@ -153,7 +153,7 @@ services:
     hostname: vespa-container
     volumes:
       - ./datasets:/datasets:ro
-      - shared-data:/data
+      # - shared-data:/data
       - ./vespa-config:/vespa-config
     ports:
       - "8082:8080"  # Map Vespa HTTP to port 8082
@@ -162,18 +162,10 @@ services:
       resources:
         limits:
           cpus: '4'
-          memory: 16G
-        reservations:
-          cpus: '2'
           memory: 8G
-
-  embedder:
-    build:
-      context: /home/iaas/ul-m2-miage-private/dockerfiles/vectorizer
-    container_name: embedder
-    hostname: local-embedder
-    ports:
-      - "8087:8000"  # Map 8000
+        reservations:
+          cpus: '0.1'
+          memory: 4G
 
   jupyterhub:
     build:
@@ -187,8 +179,8 @@ services:
       # - ./jupyterhub_config:/srv/jupyterhub
       - home:/home
       - ./home:/home/francois:rw
-      # - ./datasets:/datasets:ro
-      - shared-data:/data
+      - ./datasets:/datasets:ro
+      # - shared-data:/data:rw
       - ./vespa-config:/vespa-config
     ports:
       - "8000:8000"
@@ -202,7 +194,7 @@ services:
       - vespa
 
 volumes:
-  shared-data:
+  # shared-data:
   mysql_data:
   home:
   redis-data:
