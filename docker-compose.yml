@@ -93,6 +93,23 @@ services:
     volumes:
       - redis-data:/data
 
+  vectorizer:
+    build:
+      context: /home/iaas/ul-m2-miage-private/dockerfiles/vectorizer
+    container_name: vectorizer
+    ports:
+      - "8012:8000" # redis insights
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '1G'
+        reservations:
+          cpus: '0.1'
+          memory: '1G'
+    volumes:
+      - redis-data:/data
+
   qdrant:
     image: qdrant/qdrant
     container_name: qdrant-vdb
@@ -107,8 +124,8 @@ services:
         reservations:
           cpus: '0.1'
           memory: '2G'
-    volumes:
-      - qdrant-data:/qdrant/storage:z
+    # volumes:
+    #   - qdrant-data:/qdrant/storage:z
   
   mysql:
     image: mysql:latest
@@ -122,7 +139,7 @@ services:
       - ./datasets:/datasets:ro
       # - shared-data:/data
       - ./datasets/beers:/docker-entrypoint-initdb.d
-      - mysql_data:/var/lib/mysql
+      # - mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
     deploy:
@@ -177,7 +194,7 @@ services:
       JUPYTERHUB_API_TOKEN: your_api_token
     volumes:
       # - ./jupyterhub_config:/srv/jupyterhub
-      - home:/home
+      - home2:/home
       - ./home:/home/francois:rw
       - ./datasets:/datasets:ro
       # - shared-data:/data:rw
@@ -196,6 +213,6 @@ services:
 volumes:
   # shared-data:
   mysql_data:
-  home:
+  home2:
   redis-data:
   qdrant-data: 

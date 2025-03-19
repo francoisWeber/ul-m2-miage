@@ -4,7 +4,7 @@
 PASSWORDS_FILE="/home/francois/passwords.txt"
 
 # Path to the file to copy
-SOURCE_FILE="/home/francois/3 exercices/09-project.ipynb"
+SOURCE_FILE="/home/francois/3 exercices/schemas-MIAGE-no-cache-time.png"
 
 
 # Check if the source file exists
@@ -18,7 +18,7 @@ while IFS=" - " read -r username password; do
     # Check if the user exists on the system
     if id "$username" &>/dev/null; then
         # Define the destination path
-        DEST_FILE="/home/$username/09-project.ipynb"
+        DEST_FILE="/home/$username/schemas-MIAGE-no-cache-time.png"
 
         # Copy the file to the user's home directory
         cp "$SOURCE_FILE" "$DEST_FILE"

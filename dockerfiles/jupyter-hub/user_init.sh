@@ -4,6 +4,12 @@
 # Main (useless) user
 ADMIN_USER=iaas
 PASSWORD=azerty
+useradd -u 1001 -g 1001 -m --shell /bin/bash "$ADMIN_USER"
+echo "$ADMIN_USER:$PASSWORD" | chpasswd
+
+# Main (mine) user
+ADMIN_USER=francois
+PASSWORD=1a490110
 useradd -u 1000 -g 1000 -m --shell /bin/bash "$ADMIN_USER"
 echo "$ADMIN_USER:$PASSWORD" | chpasswd
 
@@ -83,11 +89,9 @@ do
   fi
 done < "$USER_FILE"
 
-mv $PASSWORD_BACKUP_DIR /home/francois/passwords.txt
-chown francois /home/francois/passwords.txt
+mv $PASSWORD_BACKUP_DIR /home/iaas/passwords.txt
+chown iaas /home/iaas/passwords.txt
 
-# # SHARED FOLDER CONFIG # # 
-ADMIN_USER=francois
 
 # Set ownership and permissions for the shared folder
 chown $ADMIN_USER:$SHARED_GROUP "$SHARED_FOLDER"

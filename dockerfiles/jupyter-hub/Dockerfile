@@ -11,14 +11,14 @@ RUN pip install pyspark==3.5.1 hdfs jupyter jupyter_core pyarrow requests numpy 
 # Prepare Jupyterhub stuff
 RUN pip install jupyterhub 
 # Prepare other deps for the workshop
-RUN pip install pandas requests elasticsearch mysql-connector-python pyvespa matplotlib
+RUN pip install pandas requests elasticsearch mysql-connector-python pyvespa matplotlib langdetect
 
 ## ## ## System users ## ## ##
 WORKDIR /init_users
 COPY users.txt . 
 COPY user_init.sh .
 RUN chmod +x user_init.sh
-RUN . /init_users/user_init.sh
+# RUN . /init_users/user_init.sh
 
 ## ## ## JUPYTERHUB CONFIGURATION ## ## ##
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py

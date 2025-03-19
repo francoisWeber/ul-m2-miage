@@ -111,6 +111,12 @@ schema beer {
                 bm25(description_brewery) + bm25(description_beer) 
             }
         }
+
+        second-phase {
+            expression {
+                bm25(description_brewery) * 10 + 3.14
+            }
+        }
     }
     rank-profile root {
         first-phase {
@@ -123,6 +129,12 @@ schema beer {
         first-phase {
             expression {
                 bm25(name) + bm25(description_beer)
+            }
+        }
+
+        second-phase {
+            expression {
+                (bm25(name) + 1) * (bm25(description_beer) + 1)
             }
         }
     }
