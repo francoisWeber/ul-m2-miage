@@ -1,0 +1,2 @@
+# This directory contains JupyterHub configuration files
+# users_pass.txt will be generated here when the container starts

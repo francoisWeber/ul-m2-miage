@@ -1,31 +1,38 @@
-jupyter-home/*.*
-jupyterhub_config/vespa*
+# Environment variables
+.env
 
-.local/
-.npm/
-jupyterhub_cookie_secret
-jupyterhub-proxy.pid
-jupyterhub.sqlite
+# User credentials (contains passwords)
+jupyterhub/users_pass.txt
 
-*.ipynb_checkpoints
-.jupyter
-.jupyterhub
-*.log
-*.pyc
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.ipynb_checkpoints/
+
+# Docker volumes
+volumes/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
-.AppleDouble
-.LSOverride
-Icon
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-*.ipynb_checkpoints
-.ipython
-.jupyter
-.cache/
-pip-wheel-metadata/
-*.pyc
-__pycache__/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
