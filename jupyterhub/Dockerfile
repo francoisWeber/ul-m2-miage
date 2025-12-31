@@ -1,6 +1,6 @@
 FROM quay.io/jupyterhub/jupyterhub:4.0
 
-# Install system dependencies for user management
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     sudo \
     passwd \
@@ -26,29 +26,16 @@ RUN pip install --no-cache-dir \
     requests==2.31.* \
     ipywidgets==8.1.*
 
-# Install dockerspawner for spawning user notebooks
-RUN pip install --no-cache-dir \
-    dockerspawner==12.1.* \
-    jupyterhub-nativeauthenticator==1.2.*
-
 # Create necessary directories
-RUN mkdir -p /srv/jupyterhub/config /home
-
-
-ARG VERSION=1
-RUN echo ${VERSION}
+RUN mkdir -p /srv/jupyterhub /home
 
 # Copy configuration files
 COPY jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
-COPY create_users.py /srv/jupyterhub/create_users.py
-COPY create_linux_users.py /srv/jupyterhub/create_linux_users.py
+COPY create_linux_users.sh /srv/jupyterhub/create_linux_users.sh
 COPY entrypoint.sh /srv/jupyterhub/entrypoint.sh
 
 # Make scripts executable
-RUN chmod +x /srv/jupyterhub/entrypoint.sh /srv/jupyterhub/create_linux_users.py
-
-# Copy users.txt if it exists (optional, can be mounted as volume)
-# COPY users.txt /srv/jupyterhub/users.txt
+RUN chmod +x /srv/jupyterhub/entrypoint.sh /srv/jupyterhub/create_linux_users.sh
 
 # Set working directory
 WORKDIR /srv/jupyterhub
@@ -56,7 +43,5 @@ WORKDIR /srv/jupyterhub
 # Expose JupyterHub port
 EXPOSE 8000
 
-
 # Use entrypoint script to create users before starting
-# ENTRYPOINT ["/srv/jupyterhub/entrypoint.sh"]
-
+ENTRYPOINT ["/srv/jupyterhub/entrypoint.sh"]

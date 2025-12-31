@@ -1,141 +1,66 @@
+"""
+JupyterHub configuration - Simple PAMAuthenticator setup
+
+Note: This file is executed by JupyterHub at runtime.
+The 'c' object is automatically provided by JupyterHub's configuration system.
+"""
 import os
 
-# JupyterHub configuration file for data engineering workshops
+# JupyterHub configuration - Simple PAMAuthenticator setup
 
 # ============================================================================
 # General Configuration
 # ============================================================================
 
-# The public facing URL of the whole JupyterHub application
 c.JupyterHub.bind_url = 'http://0.0.0.0:8000'
 
-# Allow named servers (optional - allows users to have multiple notebooks)
-c.JupyterHub.allow_named_servers = True
-
-# Maximum number of named servers per user
-c.JupyterHub.named_server_limit_per_user = 3
-
 # ============================================================================
-# Authentication
+# Authentication - PAMAuthenticator (uses Linux system users)
 # ============================================================================
 
-# Use Native Authenticator (simple username/password)
-# For production, consider using more robust authentication
-c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator'
+c.JupyterHub.authenticator_class = 'jupyterhub.auth.PAMAuthenticator'
+c.Authenticator.allow_all = True
 
-# Allow anyone to sign up (good for workshops)
-# For production, set to False and manually create accounts
-c.Authenticator.open_signup = True
+# Allow PAM to handle system users
+c.PAMAuthenticator.open_sessions = False
 
-# Minimum password length
-c.Authenticator.minimum_password_length = 6
-
-# Load admin users from database (set by create_users.py)
-# The entrypoint script creates users before JupyterHub starts, so the database should exist
+# Load admin users from users.txt (users marked with '*' suffix)
 def load_admin_users():
-    """Load admin users from the database"""
-    import sqlite3
-    db_path = os.getenv('JUPYTERHUB_DB_PATH', '/srv/jupyterhub/jupyterhub.sqlite')
+    """Load admin users from users.txt file"""
     admin_users = set()
+    users_file = os.getenv('USERS_FILE', '/srv/jupyterhub/users.txt')
     
-    if os.path.exists(db_path):
+    if os.path.exists(users_file):
         try:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            # Check if users table exists
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
-            if cursor.fetchone():
-                cursor.execute('SELECT name FROM users WHERE admin = 1')
-                admins = cursor.fetchall()
-                admin_users = {admin[0] for admin in admins}
-            conn.close()
+            with open(users_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#'):
+                        if line.endswith('*'):
+                            username = line[:-1].strip()
+                            if username:
+                                admin_users.add(username)
         except Exception as e:
-            print(f"Warning: Could not load admin users from database: {e}")
+            print(f"Warning: Could not load admin users from {users_file}: {e}")
     
-    # Add default admin if not in database (fallback)
-    if 'admin' not in admin_users:
+    if not admin_users:
         admin_users.add('admin')
     
     return admin_users
 
-# Set admin users (loaded from database created by create_users.py)
 c.Authenticator.admin_users = load_admin_users()
 
 # ============================================================================
-# Spawner Configuration - Local Process Spawner
+# Spawner Configuration - Simple and straightforward
 # ============================================================================
 
-# Use LocalProcessSpawner (not SimpleLocalProcessSpawner) to support user switching
-from jupyterhub.spawner import LocalProcessSpawner
-
-# Custom spawner to handle user-specific directories and permissions
-class CustomLocalProcessSpawner(LocalProcessSpawner):
-    @property
-    def notebook_dir(self):
-        """Get notebook directory for user"""
-        username = self.user.name
-        work_dir = f'/home/{username}/work'
-        # Ensure directory exists with proper permissions
-        import os
-        os.makedirs(work_dir, mode=0o755, exist_ok=True)
-        
-        # Set ownership to user (if running as root)
-        try:
-            import pwd
-            import subprocess
-            uid = pwd.getpwnam(username).pw_uid
-            gid = pwd.getpwnam(username).pw_gid
-            os.chown(work_dir, uid, gid)
-            # Ensure user has write permissions
-            os.chmod(work_dir, 0o755)
-        except Exception as e:
-            print(f"Warning: Could not set ownership for {work_dir}: {e}")
-        
-        # Copy shared notebooks if work directory is empty
-        shared_notebooks = '/shared/notebooks'
-        if os.path.exists(shared_notebooks):
-            try:
-                items = os.listdir(work_dir)
-                if not items:  # Directory is empty
-                    import shutil
-                    for item in os.listdir(shared_notebooks):
-                        src = os.path.join(shared_notebooks, item)
-                        dst = os.path.join(work_dir, item)
-                        if os.path.isdir(src):
-                            shutil.copytree(src, dst)
-                        else:
-                            shutil.copy2(src, dst)
-                    # Set ownership after copying
-                    try:
-                        import subprocess
-                        subprocess.run(['chown', '-R', f'{username}:users', work_dir], check=False)
-                    except:
-                        pass
-            except Exception as e:
-                print(f"Warning: Could not copy shared notebooks: {e}")
-        
-        return work_dir
-    
-    def get_env(self):
-        """Get environment variables for the spawner"""
-        env = super().get_env()
-        # Add shared data path
-        env['SHARED_DATA'] = '/shared/data'
-        return env
-
-c.JupyterHub.spawner_class = CustomLocalProcessSpawner
-
-# Run as the user (not root)
-# This requires the user to exist in the system
-c.LocalProcessSpawner.set_user = True
-
-# Default URL for users
+# Default URL - JupyterLab
 c.Spawner.default_url = '/lab'
 
-# Command to start single-user server
-c.LocalProcessSpawner.cmd = ['jupyter-labhub']
+# Allow running Jupyter server as root (required since container runs as root for user management)
+c.Spawner.args = ['--allow-root']
 
-# Environment variables to pass to spawned notebooks
+# Environment variables for data engineering tools
 c.Spawner.environment = {
     'MYSQL_HOST': os.getenv('MYSQL_HOST', 'mysql'),
     'MYSQL_PORT': os.getenv('MYSQL_PORT', '3306'),
@@ -152,42 +77,17 @@ c.Spawner.environment = {
     'S3_ENDPOINT': os.getenv('S3_ENDPOINT', 'http://minio:9000'),
     'S3_ACCESS_KEY': os.getenv('S3_ACCESS_KEY', 'minioadmin'),
     'S3_SECRET_KEY': os.getenv('S3_SECRET_KEY', 'minioadmin123'),
+    'SHARED_DATA': '/shared/data',
 }
 
 # ============================================================================
-# Admin and Services
+# Admin Configuration
 # ============================================================================
 
-# Admin access to all user notebooks
 c.JupyterHub.admin_access = True
-
-# Services (none required for basic setup)
-c.JupyterHub.services = []
 
 # ============================================================================
 # Logging
 # ============================================================================
 
 c.JupyterHub.log_level = 'INFO'
-c.Spawner.debug = False
-
-# ============================================================================
-# Idle Culler (optional - helps manage resources)
-# ============================================================================
-
-# Cull idle servers after 1 hour
-c.JupyterHub.load_roles = [
-    {
-        "name": "idle-culler",
-        "scopes": [
-            "list:users",
-            "read:users:activity",
-            "read:servers",
-            "delete:servers",
-        ],
-        "services": ["idle-culler"],
-    }
-]
-
-# Note: To enable idle culler, install jupyterhub-idle-culler and add service configuration
-
