@@ -24,7 +24,10 @@ RUN pip install --no-cache-dir \
     scikit-learn==1.3.* \
     plotly==5.18.* \
     requests==2.31.* \
-    ipywidgets==8.1.*
+    ipywidgets==8.1.* \
+    fsspec \ 
+    s3fs \
+    loguru
 
 # Create necessary directories
 RUN mkdir -p /srv/jupyterhub /home
