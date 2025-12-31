@@ -157,8 +157,8 @@ services:
       - ./vespa-config:/app:ro
     networks:
       - dataeng-network
-    environment:
-      - VESPA_CONFIGSERVERS=vespa
+    # environment:
+    #   - VESPA_CONFIGSERVERS=vespa
 
   # Redis In-Memory Store
   redis:
