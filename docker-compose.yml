@@ -183,6 +183,8 @@ services:
     environment:
       - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:-minioadmin}
       - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:-minioadmin}
+      - MINIO_ADMIN_USER=${MINIO_ADMIN_USER:-admin}
+      - MINIO_ADMIN_PASSWORD=${MINIO_ADMIN_PASSWORD:-admin123}
     volumes:
       - minio_data:/data
       - ./beer-dataset:/import:ro  # Import beer dataset
