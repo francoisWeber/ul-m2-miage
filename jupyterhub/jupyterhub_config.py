@@ -62,21 +62,31 @@ c.Spawner.args = ['--allow-root']
 
 # Environment variables for data engineering tools
 c.Spawner.environment = {
+    # Java configuration (required for PySpark)
+    'JAVA_HOME': os.getenv('JAVA_HOME', '/usr/lib/jvm/java-17-openjdk-amd64'),
+    # Database
     'MYSQL_HOST': os.getenv('MYSQL_HOST', 'mysql'),
     'MYSQL_PORT': os.getenv('MYSQL_PORT', '3306'),
     'MYSQL_DATABASE': os.getenv('MYSQL_DATABASE', 'beer_db'),
     'MYSQL_USER': os.getenv('MYSQL_USER', 'student'),
     'MYSQL_PASSWORD': os.getenv('MYSQL_PASSWORD', 'student123'),
+    # Redis
     'REDIS_HOST': os.getenv('REDIS_HOST', 'redis'),
     'REDIS_PORT': os.getenv('REDIS_PORT', '6379'),
+    # Qdrant
     'QDRANT_HOST': os.getenv('QDRANT_HOST', 'qdrant'),
     'QDRANT_PORT': os.getenv('QDRANT_PORT', '6333'),
+    # Vespa
     'VESPA_HOST': os.getenv('VESPA_HOST', 'vespa'),
     'VESPA_PORT': os.getenv('VESPA_PORT', '8080'),
+    # Spark
     'SPARK_MASTER': os.getenv('SPARK_MASTER', 'spark://spark-master:7077'),
+    # S3/MinIO
     'S3_ENDPOINT': os.getenv('S3_ENDPOINT', 'http://minio:9000'),
+    'AWS_ENDPOINT_URL': 'http://minio:9000',
     'S3_ACCESS_KEY': os.getenv('S3_ACCESS_KEY', 'minioadmin'),
     'S3_SECRET_KEY': os.getenv('S3_SECRET_KEY', 'minioadmin123'),
+    # Shared data
     'SHARED_DATA': '/shared/data',
 }
 

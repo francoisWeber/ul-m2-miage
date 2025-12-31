@@ -1,16 +1,21 @@
 FROM quay.io/jupyterhub/jupyterhub:4.0
 
-# Install system dependencies
+# Install system dependencies including Java for PySpark
 RUN apt-get update && apt-get install -y \
     sudo \
     passwd \
+    openjdk-17-jdk-headless \
     && rm -rf /var/lib/apt/lists/*
+
+# Set JAVA_HOME environment variable
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # Install Python packages for data engineering
 RUN pip install --no-cache-dir \
     jupyterlab==4.0.* \
     notebook==7.0.* \
-    pyspark==3.5.* \
+    pyspark==3.5.3 \
     pymysql==1.1.* \
     sqlalchemy==2.0.* \
     redis==5.0.* \
