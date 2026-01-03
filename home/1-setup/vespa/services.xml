@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<services version="1.0">
+  <container id="beers_container" version="1.0">
+    <search></search>
+    <document-api></document-api>
+    <document-processing></document-processing>
+    <component id="e5" type="hugging-face-embedder">
+      <transformer-model url="https://data.vespa-cloud.com/sample-apps-data/e5-small-v2-int8/e5-small-v2-int8.onnx"></transformer-model>
+      <tokenizer-model url="https://data.vespa-cloud.com/sample-apps-data/e5-small-v2-int8/tokenizer.json"></tokenizer-model>
+    </component>
+  </container>
+  <content id="beers_content" version="1.0">
+    <redundancy>1</redundancy>
+    <documents>
+      <document type="beer" mode="index"></document>
+    </documents>
+    <nodes>
+      <node distribution-key="0" hostalias="node1"></node>
+    </nodes>
+    <tuning>
+      <resource-limits>
+        <disk>0.9</disk>
+      </resource-limits>
+    </tuning>
+  </content>
+</services>

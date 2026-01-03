@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir \
     sqlalchemy==2.0.* \
     redis==5.0.* \
     qdrant-client==1.7.* \
-    pyvespa==0.41.* \
+    pyvespa \
     boto3==1.34.* \
     pandas==2.1.* \
     numpy==1.26.* \
@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir \
     ipywidgets==8.1.* \
     fsspec \ 
     s3fs \
-    loguru
+    loguru \
 
 # Create necessary directories
 RUN mkdir -p /srv/jupyterhub /home
