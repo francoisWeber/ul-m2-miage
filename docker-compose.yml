@@ -31,10 +31,11 @@ services:
       - jupyterhub_home:/home              # Student home directories (ephemeral, cleared between workshops)
       - ./home:/home/admin:rw              # Admin home (persistent, in local directory, read-write)
       - jupyterhub_data:/srv/jupyterhub    # JupyterHub state and database
-      - ./notebooks:/shared/notebooks:ro   # Shared notebooks (read-only template)
+      # - ./notebooks:/shared/notebooks:ro   # Shared notebooks (read-only template)
       - ./beer-dataset:/shared/data:ro     # Shared dataset (read-only)
       - ./jupyterhub/users.txt:/srv/jupyterhub/users.txt:ro
       - ./jupyterhub:/host/jupyterhub:rw   # Mount for writing passwords file back to host
+      - ./ws-questions:/shared/ws-questions:ro
     # Run as root to allow user creation (required for LocalProcessSpawner)
     user: "0:0"
     networks:
