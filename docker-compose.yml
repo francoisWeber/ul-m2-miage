@@ -211,6 +211,17 @@ services:
       - dataeng-network
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
 
+  # Vectorize REST Server
+  vectorizer:
+    build:
+      context: ./vectorize-server
+      dockerfile: Dockerfile
+    container_name: vectorizer
+    ports:
+      - "5001:5000"  # Vectorize API
+    networks:
+      - dataeng-network
+
 networks:
   dataeng-network:
     driver: bridge
