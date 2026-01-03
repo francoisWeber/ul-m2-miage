@@ -163,6 +163,21 @@ services:
     # environment:
     #   - VESPA_CONFIGSERVERS=vespa
 
+  # Vispana - Vespa Monitoring WebUI
+  vispana:
+    image: vispana/vispana:latest
+    container_name: vispana
+    profiles: [vespa]
+    ports:
+      - "4000:4000"  # Vispana WebUI
+    networks:
+      - dataeng-network
+    depends_on:
+      - vespa
+    # Vispana connects to Vespa config server at http://vespa:19071
+    # Access Vispana UI at http://localhost:4000
+    # When prompted, enter config server URL: http://vespa:19071
+
   # Redis In-Memory Store
   redis:
     image: redis:7-alpine
