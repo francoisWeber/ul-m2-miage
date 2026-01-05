@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir \
     ipywidgets==8.1.* \
     fsspec \ 
     s3fs \
-    loguru \
+    loguru
 
 # Create necessary directories
 RUN mkdir -p /srv/jupyterhub /home
