@@ -8,6 +8,28 @@ echo "Starting Data Engineering Workshop Environment"
 echo "=================================================="
 echo ""
 
+# Check if SSH preservation script exists and warn user
+if [ -f ./scripts/preserve-ssh.sh ]; then
+    echo "⚠️  IMPORTANT: If you're accessing this server via SSH,"
+    echo "   run 'sudo ./scripts/preserve-ssh.sh' BEFORE starting docker-compose"
+    echo "   to prevent SSH disconnection issues."
+    echo ""
+    read -p "Have you preserved SSH rules? (y/N): " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "⚠️  Warning: Starting docker-compose without preserving SSH rules may disconnect your SSH session."
+        echo "   If you lose connection, you'll need physical/console access to fix it."
+        echo ""
+        read -p "Continue anyway? (y/N): " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Aborted. Run 'sudo ./scripts/preserve-ssh.sh' first, then retry."
+            exit 1
+        fi
+    fi
+    echo ""
+fi
+
 # Load environment variables
 if [ -f .env ]; then
     export $(cat .env | grep -v '^#' | xargs)

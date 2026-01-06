@@ -30,7 +30,7 @@ RUN pip install --no-cache-dir \
     plotly==5.18.* \
     requests==2.31.* \
     ipywidgets==8.1.* \
-    fsspec \ 
+    fsspec \
     s3fs \
     loguru
 
