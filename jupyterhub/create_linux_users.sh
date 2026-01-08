@@ -93,6 +93,12 @@ create_user() {
         ln -s /shared/data "$data_link"
     fi
     
+    # Create ws-questions directory symlink to shared questions
+    local ws_questions_link="${home_dir}/ws-questions"
+    if [ ! -e "$ws_questions_link" ] && [ -d "/shared/ws-questions" ]; then
+        ln -s /shared/ws-questions "$ws_questions_link"
+    fi
+    
     # Set ownership
     chown -R "${username}:users" "$home_dir" 2>/dev/null || true
     

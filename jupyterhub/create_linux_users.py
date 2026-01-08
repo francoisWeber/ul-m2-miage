@@ -47,6 +47,11 @@ def create_user(username, home_base='/home'):
         if not os.path.exists(data_link):
             os.symlink('/shared/data', data_link)
         
+        # Create ws-questions directory symlink to shared questions
+        ws_questions_link = os.path.join(home_dir, 'ws-questions')
+        if not os.path.exists(ws_questions_link):
+            os.symlink('/shared/ws-questions', ws_questions_link)
+        
         # Set ownership
         subprocess.run(['chown', '-R', f'{username}:users', home_dir], check=True)
         
