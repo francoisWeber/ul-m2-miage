@@ -27,6 +27,8 @@ services:
       - S3_SECRET_KEY=${MINIO_SECRET_KEY}
       - HOST_UID=${HOST_UID:-1000}
       - HOST_GID=${HOST_GID:-1000}
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
     volumes:
       - jupyterhub_home:/home              # Student home directories (ephemeral, cleared between workshops)
       - ./home:/home/admin:rw              # Admin home (persistent, in local directory, read-write)
@@ -67,7 +69,9 @@ services:
 
   # Spark Master
   spark-master:
-    image: apache/spark:3.5.3-python3
+    build:
+      context: ./spark
+      dockerfile: Dockerfile
     container_name: spark-master
     profiles: [spark]
     user: "0:0"  # Run as root to avoid permission issues with work directory
@@ -79,6 +83,8 @@ services:
       - AWS_ENDPOINT_URL=http://minio:9000
       - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY:-minioadmin}
       - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY:-minioadmin}
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
     volumes:
       - ./beer-dataset:/opt/spark-data
       - spark_master_data:/opt/spark/work
@@ -88,7 +94,9 @@ services:
 
   # Spark Worker 1
   spark-worker-1:
-    image: apache/spark:3.5.3-python3
+    build:
+      context: ./spark
+      dockerfile: Dockerfile
     container_name: spark-worker-1
     profiles: [spark]
     user: "0:0"  # Run as root to avoid permission issues with work directory
@@ -96,11 +104,13 @@ services:
       - "8081:8081"
     environment:
       - SPARK_NO_DAEMONIZE=true
-      - SPARK_WORKER_MEMORY=6G
-      - SPARK_WORKER_CORES=24
+      - SPARK_WORKER_MEMORY=8G
+      - SPARK_WORKER_CORES=6
       - AWS_ENDPOINT_URL=http://minio:9000
       - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY:-minioadmin}
       - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY:-minioadmin}
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
     volumes:
       - ./beer-dataset:/opt/spark-data
       - spark_worker_1_data:/opt/spark/work
@@ -108,11 +118,13 @@ services:
       - dataeng-network
     depends_on:
       - spark-master
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 -m 6G -c 24
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 -m 8G -c 6
 
   # Spark Worker 2
   spark-worker-2:
-    image: apache/spark:3.5.3-python3
+    build:
+      context: ./spark
+      dockerfile: Dockerfile
     container_name: spark-worker-2
     profiles: [spark]
     user: "0:0"  # Run as root to avoid permission issues with work directory
@@ -120,11 +132,13 @@ services:
       - "8082:8081"
     environment:
       - SPARK_NO_DAEMONIZE=true
-      - SPARK_WORKER_MEMORY=6G
-      - SPARK_WORKER_CORES=24
+      - SPARK_WORKER_MEMORY=8G
+      - SPARK_WORKER_CORES=6
       - AWS_ENDPOINT_URL=http://minio:9000
       - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY:-minioadmin}
       - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY:-minioadmin}
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
     volumes:
       - ./beer-dataset:/opt/spark-data
       - spark_worker_2_data:/opt/spark/work
@@ -132,7 +146,7 @@ services:
       - dataeng-network
     depends_on:
       - spark-master
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 -m 6G -c 24
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 -m 8G -c 6
 
   # Qdrant Vector Database
   qdrant:
